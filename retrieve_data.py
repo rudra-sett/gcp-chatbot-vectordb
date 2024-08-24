@@ -56,7 +56,7 @@ def find_matches(query : str):
 
   for match in top_k:
       id = match.datapoint.datapoint_id
-      for i in range(id-2,id+3):
+      for i in range(int(id)-1,int(id)+2):
         snippet = retrieve_snippet(i)
         snippets.append(snippet)
   
