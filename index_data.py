@@ -8,8 +8,6 @@ from typing import List, Optional
 from vertexai.language_models import TextEmbeddingInput, TextEmbeddingModel
 
 from google.cloud import aiplatform
-from google.cloud.aiplatform.matching_engine import MatchingEngineIndex
-from google.cloud.aiplatform.matching_engine import MatchingEngineIndexEndpoint
 
 import os
 import csv
