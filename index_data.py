@@ -29,8 +29,8 @@ task: str = "RETRIEVAL_DOCUMENT"
 model_name: str = "text-embedding-004"
 dimensionality: Optional[int] = 384
 
-chunk_size = 500
-overlap = 100
+chunk_size = 900
+overlap = 150
 
 # Initialize storage and Document AI clients
 storage_client = storage.Client()
@@ -114,8 +114,9 @@ def batch_process_documents():
             document = documentai.Document.from_json(
                 blob.download_as_bytes(), ignore_unknown_fields=True
             )
-
             documents.append(document)
+            # assembled = assemble_document(document)
+
     return documents
 #documents[0].document_layout.blocks[0].
 def assemble_document(doc):
@@ -175,6 +176,19 @@ def vectorize_documents(documents : list[str]):
     kwargs = dict(output_dimensionality=dimensionality) if dimensionality else {}
     embeddings = model.get_embeddings(inputs, **kwargs)
     return [embedding.values for embedding in embeddings]
+
+def vectorize_single_document(document : str, index : int):
+    """Embeds texts with a pre-trained, foundational model."""
+    split_document = [document[i:i+chunk_size] for i in range(0,len(document),overlap)]
+        
+    for i, snippet in enumerate(split_document):
+        save_snippet(str(index + i), snippet)
+
+    model = TextEmbeddingModel.from_pretrained(model_name)
+    inputs = [TextEmbeddingInput(text, task) for text in split_document]
+    kwargs = dict(output_dimensionality=dimensionality) if dimensionality else {}
+    embeddings = model.get_embeddings(inputs, **kwargs)
+    return [embedding.values for embedding in embeddings], index + len(split_document)
 
 def store_embeddings(embeddings):
     bucket = storage_client.bucket(vector_bucket_name)
