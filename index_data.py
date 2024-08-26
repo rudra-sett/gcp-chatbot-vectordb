@@ -218,5 +218,6 @@ def index():
         vectors = vectorize_documents(assembled)
         store_embeddings(vectors)
         return "Success"
-    except:
+    except Exception as e:
+        print(e)
         return "Error occurred"
