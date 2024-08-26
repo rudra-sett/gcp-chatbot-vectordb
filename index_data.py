@@ -29,6 +29,9 @@ task: str = "RETRIEVAL_DOCUMENT"
 model_name: str = "text-embedding-004"
 dimensionality: Optional[int] = 384
 
+chunk_size = 500
+overlap = 100
+
 # Initialize storage and Document AI clients
 storage_client = storage.Client()
 documentai_client = documentai.DocumentProcessorServiceClient()
@@ -160,7 +163,8 @@ def vectorize_documents(documents : list[str]):
     """Embeds texts with a pre-trained, foundational model."""
     split_documents = []
     for document in documents:
-        chunks = document.split("\n\n")
+        # chunks = document.split("\n\n")
+        chunks = [document[i:i+chunk_size] for i in range(0,len(document),overlap)]
         split_documents += chunks
     
     for i, document in enumerate(split_documents):
