@@ -13,7 +13,7 @@ model_name: str = "text-embedding-004"
 dimensionality = 384
 
 # Set number of matches
-k = 5
+k = 3
 
 # Configure Vector Search client
 client_options = {
