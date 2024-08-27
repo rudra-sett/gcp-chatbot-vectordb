@@ -181,10 +181,14 @@ def vectorize_documents(documents : list[str]):
         save_snippet(str(i), document)
 
     model = TextEmbeddingModel.from_pretrained(model_name)
+    all_embeddings = []
     inputs = [TextEmbeddingInput(text, task) for text in split_documents]
-    kwargs = dict(output_dimensionality=dimensionality) if dimensionality else {}
-    embeddings = model.get_embeddings(inputs, **kwargs)
-    return [embedding.values for embedding in embeddings]
+    for i in range(0,len(inputs),10):
+        kwargs = dict(output_dimensionality=dimensionality) if dimensionality else {}
+        embeddings = model.get_embeddings(inputs[i:i+10], **kwargs)
+        for embedding in embeddings:
+            all_embeddings.append(embedding.values)
+    return all_embeddings
 
 def vectorize_single_document(document : str, index : int):
     """Embeds texts with a pre-trained, foundational model."""
