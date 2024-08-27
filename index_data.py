@@ -29,8 +29,8 @@ task: str = "RETRIEVAL_DOCUMENT"
 model_name: str = "text-embedding-004"
 dimensionality: Optional[int] = 384
 
-chunk_size = 900
-overlap = 150
+chunk_size = 300
+overlap = 50
 
 # Initialize storage and Document AI clients
 storage_client = storage.Client()
@@ -142,14 +142,22 @@ def assemble_document(doc):
     elif isinstance(doc, documentai.Document.DocumentLayout.DocumentLayoutBlock):
         text_parts = []
         text_block = doc.text_block        
+        table_block = doc.table_block
         if text_block.text:
             text_parts.append(text_block.text)
             if "heading" in text_block.type_.lower():
                 # Add two newlines after headings for separation
-                text_parts = ["\n\n"] + text_parts
+                text_parts = ["\n\n"] + text_parts + [" "]
             else:
                 # Add a space after regular text blocks
-                text_parts.append(" ")        
+                text_parts.append(" ")    
+        if table_block.body_rows:
+            print("got table!")
+            for row in table_block.body_rows:
+                for cell in row.cells:
+                    if cell.blocks:
+                        for block in cell.blocks:
+                            text_parts.append(assemble_document(block))        
         if text_block.blocks:
             # Recursively process nested blocks
             for block in text_block.blocks:
@@ -165,7 +173,8 @@ def vectorize_documents(documents : list[str]):
     split_documents = []
     for document in documents:
         # chunks = document.split("\n\n")
-        chunks = [document[i:i+chunk_size] for i in range(0,len(document),overlap)]
+        split_doc = document.split(" ")
+        chunks = [" ".join(split_doc[i:i+chunk_size]) for i in range(0,len(split_doc),chunk_size-overlap)]
         split_documents += chunks
     
     for i, document in enumerate(split_documents):
@@ -228,9 +237,13 @@ def save_snippet(snippet_id: str, snippet_text: str):
 def index():
     try:
         documents = batch_process_documents()
+        print("processed")
         assembled = [assemble_document(doc) for doc in documents]
+        print("assembled")
         vectors = vectorize_documents(assembled)
+        print("vectorized")
         store_embeddings(vectors)
+        print("stored")
         return "Success"
     except Exception as e:
         print(e)
