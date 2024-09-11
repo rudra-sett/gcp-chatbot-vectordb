@@ -3,9 +3,9 @@ from google.cloud import aiplatform_v1
 from vertexai.language_models import TextEmbeddingInput, TextEmbeddingModel
 
 # Set variables for the current deployed index.
-API_ENDPOINT="723219736.us-central1-872489082435.vdb.vertexai.goog"
-INDEX_ENDPOINT="projects/872489082435/locations/us-central1/indexEndpoints/5661671244441845760"
-DEPLOYED_INDEX_ID="ride_index_1724456188226"
+API_ENDPOINT="194552693.us-central1-872489082435.vdb.vertexai.goog"
+INDEX_ENDPOINT="projects/872489082435/locations/us-central1/indexEndpoints/7976239977933570048"
+DEPLOYED_INDEX_ID="ride_index_b_1724777314335"
 
 # Set variables for embeddings
 task: str = "RETRIEVAL_DOCUMENT"
@@ -62,7 +62,7 @@ def find_matches(query : str):
   
   return snippets
 
-vector_bucket_name = "ride-vector-data"
+vector_bucket_name = "ride-data-dev"
 
 def retrieve_snippet(snippet_id: str) -> str:
     """Retrieves a snippet from GCS by its ID."""
